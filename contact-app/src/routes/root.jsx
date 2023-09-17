@@ -1,10 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Outlet, Link, useLoaderData,Form, } from 'react-router-dom'
+import { Outlet, NavLink, useLoaderData,Form, redirect, useNavigation, } from 'react-router-dom'
 import { getContacts, createContact, } from '../contacts'
 
 export async function action () {
     const contact = await createContact();
-    return { contact };
+    return redirect(`/contacts/${contact.id}/edit`);
 }
 
 export async function loader() {
@@ -14,6 +14,8 @@ export async function loader() {
 
 const Root = () => {
     const { contacts } = useLoaderData();
+    const navigation = useNavigation();
+
     return (
         <div className='container-fluid'>
             <div className='container-fluid wrapper vh-100'>
@@ -51,13 +53,18 @@ const Root = () => {
                                     <button className='btn btn-primary' type="submit">New</button>
                                 </Form>
                             </div>
-                            <div className='navbar mt-3 ms-4'>
+                            <div className='navbar mt-3'>
                                 <nav>
                                     {contacts.length ? (
                                         <ul>
                                         {contacts.map((contact) => (
-                                            <li key={contact.id}>
-                                            <Link to={`contacts/${contact.id}`}>
+                                            <li key={contact.id} style={{
+                                                listStyle: 'none', fontSize: '25px',
+                                            }}>
+                                            <NavLink to={`contacts/${contact.id}`} className={({isActive, isPending}) => isActive ? "text-white fw-bold fs-2" : isPending ? "bg-dark" : "" }
+                                            style={{
+                                                textDecoration: 'none',
+                                            }}>
                                                 {contact.first || contact.last ? (
                                                 <>
                                                     {contact.first} {contact.last}
@@ -66,7 +73,7 @@ const Root = () => {
                                                 <i>No Name</i>
                                                 )}{" "}
                                                 {contact.favorite && <span>★</span>}
-                                            </Link>
+                                            </NavLink>
                                             </li>
                                         ))}
                                         </ul>
@@ -79,8 +86,10 @@ const Root = () => {
                             </div>
                         </div>
                     </div>
-                    <div id='detail' className='col-sm-8 vh-100'>
-                        <Outlet />
+                    <div className='col-sm-8 vh-100'>
+                        <div id='detail' className={ navigation.state === "loading" ? "loading" : ""}>
+                            <Outlet />
+                        </div>   
                     </div>
                     <footer className=''>Ini footer</footer>
                 </div>

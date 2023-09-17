@@ -24,6 +24,9 @@ export default function Contact() {
         <img
           key={contact.avatar}
           src={contact.avatar || null}
+          style={{
+            borderRadius: '10px',
+          }}
         />
       </div>
 
